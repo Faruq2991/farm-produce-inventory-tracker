@@ -77,7 +77,9 @@ class Inventory():
             return
     print("❌ Item not found in inventory.")
 
-
+    def check_low_stock(self, threshold = 10):
+        low_stock_items = [item for item in self.produces if item.quantity <= threshold]
+        return low_stock_items
 
     def save_to_file(self, path: str):
         """

@@ -1,207 +1,145 @@
-# Farm Produce Inventory Tracker
+# 🌽 Farm Produce Inventory Tracker
 
-A Python-based command-line application for managing farm produce inventory, tracking transactions, and maintaining detailed records of agricultural products.
+A simple Python command-line application to manage farm produce inventory, record sales, and track total revenue. Data is persisted in a JSON file for easy backup and portability.
 
-## Description
+---
 
-The Farm Produce Inventory Tracker is a comprehensive CLI tool designed to help farmers and agricultural businesses manage their produce inventory efficiently. The application provides functionality to:
+## Features
 
-- **Track Produce Items**: Manage different types of farm produce with details like name, category, and unit of measurement
-- **Inventory Management**: Monitor current stock levels, track additions and removals
-- **Transaction History**: Record and view all inventory transactions including sales, purchases, and adjustments
-- **Data Persistence**: Store all data in JSON format for easy backup and portability
-- **Reporting**: Generate reports on inventory status and transaction history
+- **Add Produce:** Add new produce items with name, quantity, and price per unit.
+- **View Inventory:** List all produce currently in stock.
+- **Record Sales:** Record sales and automatically update inventory and revenue.
+- **Revenue Tracking:** View total revenue from all sales.
+- **Data Persistence:** Inventory and revenue are saved to a JSON file.
 
-### Project Structure
+---
+
+## Project Structure
 
 ```
 farm-produce-inventory-tracker/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py              # Main CLI application entry point
+│   ├── main.py              # Main CLI application
 │   └── models/
 │       ├── __init__.py
 │       ├── inventory.py     # Inventory management logic
-│       ├── produce.py       # Produce item definitions
-│       └── transaction.py   # Transaction tracking
+│       ├── produce.py       # Produce item model
+│       └── transaction.py   # (Reserved for future use)
 ├── data/
-│   └── inventory.json       # Data storage file
+│   └── inventory.json       # Inventory and revenue data
 ├── tests/
 │   ├── __init__.py
-│   └── test_inventory.py   # Unit tests
-├── requirements.txt         # Python dependencies
-├── .gitignore             # Git ignore rules
-└── README.md              # This file
+│   ├── test_inventory.py    # Inventory tests
+│   └── test_produce.py      # Produce item tests
+├── requirements.txt         # Python dependencies (currently empty)
+├── .gitignore
+└── README.md
 ```
 
-## How to Set Up the Project Locally
+---
+
+## Getting Started
 
 ### Prerequisites
 
 - Python 3.8 or higher
-- pip (Python package installer)
 
-### Installation Steps
+### Installation
 
-1. **Clone the repository**
+1. **Clone the repository:**
    ```bash
    git clone <repository-url>
    cd farm-produce-inventory-tracker
    ```
 
-2. **Create a virtual environment**
+2. **Create and activate a virtual environment:**
    ```bash
    python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-3. **Activate the virtual environment**
-   
-   **On Windows:**
-   ```bash
-   venv\Scripts\activate
-   ```
-   
-   **On macOS/Linux:**
-   ```bash
-   source venv/bin/activate
-   ```
-
-4. **Install dependencies**
+3. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
+   *(No external dependencies required by default)*
 
-5. **Verify installation**
-   ```bash
-   python -c "import sys; print(f'Python {sys.version}')"
-   ```
+---
 
-### Development Setup
+## Usage
 
-For development, you may want to install additional tools:
+### Running the Application
 
-```bash
-pip install pytest  # For running tests
-pip install black   # For code formatting
-pip install flake8  # For linting
-```
-
-## How to Run the CLI
-
-### Basic Usage
-
-Once the project is set up, you can run the CLI application using:
+You must specify a data file path for inventory storage (e.g., `data/inventory.json`):
 
 ```bash
-python -m app.main
+python -m app.main data/inventory.json
 ```
 
-### Available Commands
+### Menu Options
 
-The CLI provides the following main commands:
+1. **Add a new produce item:**  
+   Enter the name, quantity (integer), and price per unit (decimal).
 
-#### Inventory Management
-```bash
-# Add new produce item
-python -m app.main add-produce --name "Tomatoes" --category "Vegetables" --unit "kg"
+2. **View all produce in stock:**  
+   Lists all items in inventory.
 
-# View current inventory
-python -m app.main list-inventory
+3. **Record a sale:**  
+   Enter the produce name and quantity sold. Inventory and revenue are updated.
 
-# Update stock levels
-python -m app.main update-stock --item "Tomatoes" --quantity 50 --type "add"
-python -m app.main update-stock --item "Tomatoes" --quantity 10 --type "remove"
-```
+4. **View total revenue:**  
+   Displays the total revenue from all sales.
 
-#### Transaction Tracking
-```bash
-# Record a sale
-python -m app.main record-sale --item "Tomatoes" --quantity 5 --price 2.50
+5. **Exit:**  
+   Saves inventory and exits the program.
 
-# Record a purchase
-python -m app.main record-purchase --item "Seeds" --quantity 100 --price 0.10
+---
 
-# View transaction history
-python -m app.main list-transactions
-```
+## Data Storage
 
-#### Reporting
-```bash
-# Generate inventory report
-python -m app.main report --type inventory
+- All inventory and revenue data are stored in the JSON file you specify (e.g., `data/inventory.json`).
+- The file is created automatically if it does not exist.
 
-# Generate sales report
-python -m app.main report --type sales
-
-# Export data
-python -m app.main export --format json
-```
-
-### Command Examples
-
-```bash
-# Initialize the application (first time setup)
-python -m app.main init
-
-# Add multiple produce items
-python -m app.main add-produce --name "Apples" --category "Fruits" --unit "kg"
-python -m app.main add-produce --name "Carrots" --category "Vegetables" --unit "kg"
-python -m app.main add-produce --name "Eggs" --category "Dairy" --unit "dozen"
-
-# Check current inventory
-python -m app.main list-inventory
-
-# Record some transactions
-python -m app.main record-sale --item "Apples" --quantity 10 --price 3.00
-python -m app.main record-purchase --item "Carrots" --quantity 25 --price 1.50
-
-# Generate a comprehensive report
-python -m app.main report --type all
-```
-
-### Data Storage
-
-All data is stored in the `data/inventory.json` file. This file contains:
-- Produce item definitions
-- Current inventory levels
-- Transaction history
-
-**Note**: The data file is automatically created when you first run the application. Make sure to backup this file regularly.
+---
 
 ## Testing
 
-Run the test suite to ensure everything is working correctly:
+Run the test suite with:
 
 ```bash
 python -m pytest tests/
 ```
 
+---
+
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes
+4. Push to your branch
 5. Open a Pull Request
+
+---
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License
 
-## Support
-
-If you encounter any issues or have questions about the Farm Produce Inventory Tracker, please:
-
-1. Check the existing issues in the repository
-2. Create a new issue with detailed information about your problem
-3. Include your operating system and Python version in the issue description
+---
 
 ## Roadmap
 
-- [ ] Web interface for easier data entry
-- [ ] Mobile app for field data collection
-- [ ] Integration with accounting software
-- [ ] Advanced reporting and analytics
-- [ ] Multi-user support with role-based access
-- [ ] Export to Excel/CSV formats
-- [ ] Barcode scanning support
+- [ ] Improve error handling and input validation
+- [ ] Add transaction history and reporting
+- [ ] Web or GUI interface
+- [ ] Multi-user support
+ - [] Mobile app for field data collection
+ - [] Integration with accounting software
+ - [] Advanced reporting and analytics
+ - [] Multi-user support with role-based access
+ - [] Export to Excel/CSV formats
+ - [] Barcode scanning support
+
+---

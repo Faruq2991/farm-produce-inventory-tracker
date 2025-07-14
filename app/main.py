@@ -23,7 +23,7 @@ def display_menu():
 while True:
     display_menu()
     choice_input = input("Select an option (1–5): ").strip()
-    if not choice_input.isdigit() or int(choice_input) not in range(1, 5):
+    if not choice_input.isdigit() or int(choice_input) not in range(1, 7):
         print("Invalid choice. Please enter a number from 1 to 5")
         continue
     choice = int(choice_input)
@@ -56,6 +56,15 @@ while True:
         print(f"Total Revenue: ${sales:.2f}")
 
     elif choice == 5:
+        name = input("Enter item to adjust: ").strip()
+        try:
+            qty_change = int(input("Enter quantity change (use negative for decrease): "))
+            note = input("Reason for adjustment (optional): ").strip()
+            inventory.adjust_item(name, qty_change, note)
+        except ValueError:
+            print("❌ Quantity change must be a valid integer.")
+
+    elif choice == 6:
         print("Goodbye!")
         break
     else: 

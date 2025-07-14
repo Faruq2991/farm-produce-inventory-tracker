@@ -141,7 +141,6 @@ class Transaction():
         else:
             self.timestamp = timestamp
 
-
     def __str__(self):
         return f"[{self.timestamp}] {self.type.upper()}: {self.quantity} {self.produce_name} @ ${self.unit_price:.2f} each - {self.note}"
 

@@ -38,7 +38,7 @@ class Inventory():
                 sale_amount = quantity_sold * item.price_per_unit
                 self.total_revenue += sale_amount
 
-                print("{quantity_sold} {item.name} sold for ${sale_amount:.2f}")
+                print(f"{quantity_sold} {item.name} sold for ${sale_amount:.2f}")
                 return
         print("Item not found in inventory.")
         return

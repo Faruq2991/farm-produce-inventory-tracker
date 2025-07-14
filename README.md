@@ -135,11 +135,19 @@ MIT License
 - [ ] Add transaction history and reporting
 - [ ] Web or GUI interface
 - [ ] Multi-user support
- - [] Mobile app for field data collection
- - [] Integration with accounting software
- - [] Advanced reporting and analytics
- - [] Multi-user support with role-based access
- - [] Export to Excel/CSV formats
- - [] Barcode scanning support
+- [ ] Mobile app for field data collection
+- [ ] Integration with accounting software
+- [ ] Advanced reporting and analytics
+- [ ] Multi-user support with role-based access
+- [ ] Export to Excel/CSV formats
+- [ ] Barcode scanning support
+- [ ] Adding AI capabilities: 
+   - Market Analysis for a particular produce.
+   - Identify Comapanies that can off take from the farmer.
+   - Identify local businesses or buyers.
+   - Preservation techniques.
 
 ---
+
+
+

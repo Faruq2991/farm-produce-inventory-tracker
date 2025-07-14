@@ -146,6 +146,20 @@ MIT License
    - Identify Comapanies that can off take from the farmer.
    - Identify local businesses or buyers.
    - Preservation techniques.
+- [ ] 📊 1. Generate Reports
+   - Print a list of all transactions (with filters by type, date, or item)
+   - Show current inventory with value (qty × price)
+- [ ] 📁 2. Export to CSV
+   - Make inventory and transactions exportable for Excel/Google Sheets users
+- [ ] 🔍 3. CLI Enhancements
+   - Add search/filter capabilities
+- [ ]Show low-stock warnings (e.g., if stock < 5)
+- [ ] 🌐 4. Turn It Into a Web App
+   - Build a REST API with FastAPI
+   - Or a simple Flask dashboard
+- [ ] 🧪 5. Advanced Tests
+   - Parametrized test cases for edge conditions
+   - CLI test automation
 
 ---
 

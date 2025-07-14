@@ -1,8 +1,16 @@
-from multiprocessing import Value
+import sys
+import os
 from app.models.inventory import Inventory
 
-inventory: Inventory = Inventory()
+if len(sys.argv) < 2:
+    print("❌ Please provide a file path to store your inventory.")
+    print("Usage: python main.py data/inventory.json")
+    sys.exit(1)
 
+file_path = sys.argv[1]
+
+inventory: Inventory = Inventory()
+inventory.load_from_file(file_path)
 
 def display_menu():
     print("🌽 Farm Produce Inventory Tracker 🌽")

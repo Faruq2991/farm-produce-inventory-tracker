@@ -1,4 +1,5 @@
-
+import json
+import os
 from app.models.produce import ProduceItem
 
 class Inventory():
@@ -45,3 +46,41 @@ class Inventory():
 
     def get_total_revenue(self):
         return self.total_revenue
+
+    def save_to_file(self, path: str):
+        """
+        Save the current inventory and total revenue to a JSON file.
+        """
+        data = {
+            "produces": [item.to_dict() for item in self.produces],
+            "total_revenue": self.total_revenue
+        }
+
+        # Ensure the parent directory exists
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+
+        try:
+            with open(path, "w") as file:
+                json.dump(data, file, indent=4)
+            print(f"✅ Inventory saved to {path}")
+        except Exception as e:
+            print(f"❌ Failed to save inventory: {e}")
+
+    def load_from_file(self, path: str):
+        """
+        Load inventory and revenue from a JSON file if it exists.
+        """
+        if not os.path.exists(path):
+            print(f"📁 No saved inventory found at {path}. Starting fresh.")
+            return
+
+        try:
+            with open(path, "r") as file:
+                data = json.load(file)
+
+            self.produces = [ProduceItem.from_dict(item) for item in data.get("produces", [])]
+            self.total_revenue = data.get("total_revenue", 0.0)
+
+            print(f"✅ Inventory loaded from {path}")
+        except Exception as e:
+            print(f"❌ Failed to load inventory: {e}")

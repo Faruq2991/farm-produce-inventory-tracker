@@ -1,5 +1,4 @@
 
-
 class ProduceItem():
     def __init__(self, name, quantity, price_per_unit):
         """
@@ -23,4 +22,24 @@ class ProduceItem():
 
     def __str__(self) -> str:
         return f"{self.name} | {self.quantity} | ${self.price_per_unit:.2f} each"
-        
+    
+    def to_dict(self) -> dict:
+        """
+        Convert the ProduceItem instance to a dictionary for JSON serialization.
+        """
+        return {
+            "name": self.name,
+            "quantity": self.quantity,
+            "price_per_unit": self.price_per_unit
+        }
+
+    @staticmethod
+    def from_dict(data: dict):
+        """
+        Create a ProduceItem instance from a dictionary.
+        """
+        return ProduceItem(
+            name=data["name"],
+            quantity=data["quantity"],
+            price_per_unit=data["price_per_unit"]
+        )

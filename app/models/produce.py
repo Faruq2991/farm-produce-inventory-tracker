@@ -1,12 +1,14 @@
 
 class ProduceItem():
-    def __init__(self, name, quantity, price_per_unit):
+    def __init__(self, name, quantity, price_per_unit, category, unit_of_measurement):
         """
         Initialize a ProduceItem with name, quantity in stock, and price per unit.
         """
         self.name = name
         self.quantity = quantity
         self.price_per_unit = price_per_unit
+        self.category = category
+        self.unit_of_measurement = unit_of_measurement
 
     def update_quantity(self, new_quantity: int):
         if new_quantity >= 0:
@@ -21,7 +23,7 @@ class ProduceItem():
             raise ValueError("Price cannot be negative.")
 
     def __str__(self) -> str:
-        return f"{self.name} | {self.quantity} | ${self.price_per_unit:.2f} each"
+        return f"{self.name} | {self.quantity} | ${self.price_per_unit:.2f} | {self.category} | {self.unit_of_measurement}"
     
     def to_dict(self) -> dict:
         """
@@ -30,7 +32,9 @@ class ProduceItem():
         return {
             "name": self.name,
             "quantity": self.quantity,
-            "price_per_unit": self.price_per_unit
+            "price_per_unit": self.price_per_unit,
+            "category": self.category,
+            "unit_of_measurement": self.unit_of_measurement
         }
 
     @staticmethod
@@ -41,5 +45,7 @@ class ProduceItem():
         return ProduceItem(
             name=data["name"],
             quantity=data["quantity"],
-            price_per_unit=data["price_per_unit"]
+            price_per_unit=data["price_per_unit"],
+            category=data["category"],
+            unit_of_measurement=data["unit_of_measurement"]
         )

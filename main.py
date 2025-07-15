@@ -1,5 +1,7 @@
+from datetime import date
 import sys
 import os
+from datetime import datetime
 from app.models.inventory import Inventory
 
 if len(sys.argv) < 2:
@@ -19,15 +21,25 @@ def display_menu():
     print("3. Record a sale")
     print("4. View total revenue")
     print("5. Adjust item quantity")
-    print("6. Exit")
+    print("6. View Reports")
+    print("7. Exit")
+
+def reports_menu():
+    print("\nView Reports")
+    print("1. 📄 View all transactions")
+    print("2. 💰 View total revenue")
+    print("3. 📦 Inventory value summary")
+    print("4. ⚠️ Low stock items")
+    print("5. 🔍 Filter transactions by type")
+    print("7. 📅 Filter transactions by date")
+    print("0. Back to Main Menu")
 
 while True:
     display_menu()
-    choice_input = input("Select an option (1–6): ").strip()
+    choice_input = input("Select an option (1–7): ").strip()
     
-    # Fixed range validation - should be 1-6, not 1-7
-    if not choice_input.isdigit() or int(choice_input) not in range(1, 7):
-        print("❌ Invalid choice. Please enter a number from 1 to 6")
+    if not choice_input.isdigit() or int(choice_input) not in range(1, 8):
+        print("❌ Invalid choice. Please enter a number from 1 to 7")
         continue
     
     choice = int(choice_input)
@@ -113,13 +125,66 @@ while True:
                 print(f" - {item.name}: Only {item.quantity} left")
 
     elif choice == 6:
+        while True:
+            reports_menu()
+            choice_input_2 = input("Select an option (1–6 or 0 to top menu.): ").strip()
+    
+            if not choice_input_2.isdigit() or int(choice_input_2) not in range(0, 7):
+                print("❌ Invalid choice. Please enter a number from 0 to 6")
+                continue
+            choice_2 = int(choice_input_2)
+
+            if choice_2 == 1:
+                transacts = inventory.get_transaction_history()
+                print(transacts)
+
+            elif choice_2 == 2:
+                total_rev = inventory.get_inventory_value()
+                print(total_rev)
+
+            elif choice_2 == 3:
+                inventory_report = inventory.get_inventory_report()
+                for r in inventory_report:
+                    print(r)
+
+            elif choice_2 == 4: 
+                thresh = int(input("Enter a threshold to check: "))
+                results = inventory.check_low_stock(thresh)
+                for r in results:
+                    print(f"{r}")
+
+            elif choice_2 == 5:
+                txn_type = input("Type of transaction: ")
+                results = inventory.filter_transactions_by_type(txn_type)
+                for r in results:
+                    print(f"{r}")
+
+            elif choice_2 == 6:
+                try:
+                    start_date_str = input("Enter start date (YYYY-MM-DD): ")
+                    end_date_str = input("Enter end date (YYYY-MM-DD): ")
+                    
+                    start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+                    end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
+                    results = inventory.filter_transactions_by_date(start_date, end_date)
+                    for r in results:
+                        print(f"{r}")
+                except ValueError:
+                    print("❌ Invalid date format. Please use YYYY-MM-DD.")
+
+            elif choice_2 == 0:
+                print("0 to top menu")
+                break
+            else:
+                print("❌ Invalid choice. Please select a number from 1 to 7.")
+
+    elif choice == 7:
         # Save inventory before exiting
         inventory.save_to_file(file_path)
         print("👋 Goodbye!")
         break
-    
     else: 
-        print("❌ Invalid choice. Please select a number from 1 to 6.")
+        print("❌ Invalid choice. Please select a number from 1 to 7.")
 
 try:
     inventory.save_to_file(file_path)

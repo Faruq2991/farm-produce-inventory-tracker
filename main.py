@@ -1,6 +1,5 @@
 from datetime import date
 import sys
-import os
 from datetime import datetime
 from app.models.inventory import Inventory
 
@@ -29,7 +28,7 @@ def reports_menu():
     print("1. 📄 View all transactions")
     print("2. 💰 View total revenue")
     print("3. 📦 Inventory value summary")
-    print("4. ⚠️ Low stock items")
+    print("4. ⚠️  Low stock items")
     print("5. 🔍 Filter transactions by type")
     print("7. 📅 Filter transactions by date")
     print("0. Back to Main Menu")
@@ -46,6 +45,9 @@ while True:
 
     if choice == 1:
         name = input("Enter Produce name: ").strip()
+        category = input("Enter Category (optional): ").strip()
+        if not category:
+            category = "Uncategorized"
 
         try:
             qty = int(input("Enter QTY: "))
@@ -63,7 +65,7 @@ while True:
             print("❌ Invalid price. Please enter a valid number.")
             continue
 
-        inventory.add_item(name, qty, price)
+        inventory.add_item(name, qty, price, category)
         print(f"✅ '{qty}' of {name} added to your inventory!")
 
         # 🟡 Low-stock check
@@ -74,7 +76,6 @@ while True:
                 print(f" - {item.name}: Only {item.quantity} left")
 
     elif choice == 2:
-        print("\n📦 Current Inventory:")
         inventory.list_items()
 
     elif choice == 3:
@@ -136,28 +137,63 @@ while True:
 
             if choice_2 == 1:
                 transacts = inventory.get_transaction_history()
-                print(transacts)
+                for txn in transacts:
+                    print(txn)
 
             elif choice_2 == 2:
-                total_rev = inventory.get_inventory_value()
-                print(total_rev)
+                total_value, breakdown = inventory.get_inventory_value()
 
-            elif choice_2 == 3:
-                inventory_report = inventory.get_inventory_report()
-                for r in inventory_report:
-                    print(r)
+                print("\n📦 Inventory Value Summary\n")
+                
+                for item in breakdown:
+                    name = item['name']
+                    qty = item['quantity']
+                    price = item['price']
+                    value = item['value']
+                    print(f"- {name}: {qty} units × ${price:.2f} = ${value:.2f}")
 
-            elif choice_2 == 4: 
-                thresh = int(input("Enter a threshold to check: "))
-                results = inventory.check_low_stock(thresh)
-                for r in results:
-                    print(f"{r}")
+                print(f"\n💰 Total Inventory Value: ${float(total_value):,.2f}")
+
+            elif choice_2 == 3:    
+                total_value, breakdown = inventory.get_inventory_value()
+
+                print("\n📊 Inventory Value Report")
+                print("=" * 40)
+
+                for item in breakdown:
+                    name = item['name']
+                    qty = item['quantity']
+                    price = item['price']
+                    value = item['value']
+                    category = item.get('category', 'N/A')
+
+                    print(f"🟢 {name} ({category})")
+                    print(f"   Quantity : {qty}")
+                    print(f"   Unit Price : ${price:,.2f}")
+                    print(f"   Total Value: ${value:,.2f}\n")
+
+                print("=" * 40)
+                print(f"💰 Total Inventory Value: ${float(total_value):,.2f}")
+
+            elif choice_2 == 4:
+                try:
+                    thresh = int(input("Enter a threshold to check: "))
+                    low_items = inventory.check_low_stock(thresh)
+
+                    if not low_items:
+                        print("✅ All items are above the threshold.")
+                    else:
+                        print(f"\n⚠️  Low Stock Items (below {thresh} units):")
+                        for item in low_items:
+                            print(f" - {item.name}: {item.quantity} in stock")
+                except ValueError:
+                    print("❌ Invalid input. Please enter a number.")
 
             elif choice_2 == 5:
                 txn_type = input("Type of transaction: ")
                 results = inventory.filter_transactions_by_type(txn_type)
                 for r in results:
-                    print(f"{r}")
+                    print(r)
 
             elif choice_2 == 6:
                 try:
@@ -168,7 +204,7 @@ while True:
                     end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
                     results = inventory.filter_transactions_by_date(start_date, end_date)
                     for r in results:
-                        print(f"{r}")
+                        print(r)
                 except ValueError:
                     print("❌ Invalid date format. Please use YYYY-MM-DD.")
 

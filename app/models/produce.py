@@ -23,7 +23,7 @@ class ProduceItem():
             raise ValueError("Price cannot be negative.")
 
     def __str__(self) -> str:
-        return f"{self.name} | {self.quantity} | ${self.price_per_unit:.2f} | {self.category} | {self.unit_of_measurement}"
+        return f"{self.name} | {self.quantity} | ${self.price_per_unit:.2f} | Category: {self.category} | {self.unit_of_measurement}"
     
     def to_dict(self) -> dict:
         """

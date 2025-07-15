@@ -33,30 +33,56 @@ while True:
     choice = int(choice_input)
 
     if choice == 1:
-        name = input("Enter Produce name: ")
+        name = input("Enter Produce name: ").strip()
+
         try:
             qty = int(input("Enter QTY: "))
-            price = float(input("Enter Price Per Unit: "))
+            if qty <= 0:
+                raise ValueError("Quantity must be a positive number.")
         except ValueError:
-            print("❌ Invalid input. Quantity must be a number and price must be a decimal.")
+            print("❌ Invalid quantity. Please enter a positive integer.")
             continue
-        
+
+        try:
+            price = float(input("Enter Price Per Unit: "))
+            if price < 0:
+                raise ValueError("Price must be non-negative.")
+        except ValueError:
+            print("❌ Invalid price. Please enter a valid number.")
+            continue
+
         inventory.add_item(name, qty, price)
-        print(f"✅ '{qty}' units of {name} added to your inventory!")
+        print(f"✅ '{qty}' of {name} added to your inventory!")
+
+        # 🟡 Low-stock check
+        low_stock_items = inventory.check_low_stock()
+        if low_stock_items:
+            print("\n⚠️  Low Stock Alert:")
+            for item in low_stock_items:
+                print(f" - {item.name}: Only {item.quantity} left")
 
     elif choice == 2:
         print("\n📦 Current Inventory:")
         inventory.list_items()
 
     elif choice == 3:
-        name = input("Stock name: ")
+        name = input("Stock name: ").strip()
         try:
             qty = int(input("Qty Sold: "))
+            if qty <= 0:
+                raise ValueError
         except ValueError:
-            print("❌ Invalid input. Quantity must be a number.")
-            continue  # Added missing continue
-        
+            print("❌ Invalid quantity. Enter a positive whole number.")
+            continue
+
         inventory.record_sale(name, qty)
+
+        # 🟡 Low-stock check
+        low_stock_items = inventory.check_low_stock()
+        if low_stock_items:
+            print("\n⚠️  Low Stock Alert:")
+            for item in low_stock_items:
+                print(f" - {item.name}: Only {item.quantity} left")
 
     elif choice == 4:
         sales = inventory.get_total_revenue()
@@ -66,6 +92,9 @@ while True:
         name = input("Enter item to adjust: ").strip()
         try:
             qty_change = int(input("Enter quantity change (use negative for decrease): "))
+            if qty_change == 0:
+                raise ValueError("Zero is not a valid adjustment.")
+
             note = input("Reason for adjustment (optional): ").strip()
             
             # Check if adjust_item method exists, if not, provide alternative
@@ -76,6 +105,12 @@ while True:
                 print("💡 You can manually add/remove items using options 1 and 3.")
         except ValueError:
             print("❌ Quantity change must be a valid integer.")
+
+        low_stock_items = inventory.check_low_stock()
+        if low_stock_items:
+            print("\n⚠️  Low Stock Alert:")
+            for item in low_stock_items:
+                print(f" - {item.name}: Only {item.quantity} left")
 
     elif choice == 6:
         # Save inventory before exiting

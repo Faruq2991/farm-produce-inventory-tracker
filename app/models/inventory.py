@@ -4,6 +4,7 @@ from datetime import date, datetime
 from typing import List, Dict, Optional, Tuple
 from decimal import Decimal
 from app.models.produce import ProduceItem
+from app.models.transaction import Transaction
 
 
 class InventoryError(Exception):
@@ -138,7 +139,7 @@ class Inventory:
             return
 
         print("\n📋 Current Inventory:")
-        print("-" * 80)
+        print("-" * 0)
         for item in sorted(items_to_show, key=lambda x: x.name):
             stock_status = "⚠️ LOW" if item.quantity <= threshold else "✅"
             print(f"{stock_status} {item}")
@@ -314,6 +315,20 @@ class Inventory:
                                      if (datetime.now() - datetime.fromisoformat(tx.timestamp)).days <= 7])
         }
 
+    def _find_item_by_name(self, name: str) -> Optional[ProduceItem]:
+        """Find item by name (case-insensitive)."""
+        name_lower = name.lower().strip()
+        for item in self.produces:
+            if item.name.lower() == name_lower:
+                return item
+        return None
+
+    def _log_transaction(self, type: str, produce_name: str, quantity: int, 
+                        price: Decimal, note: str = "") -> None:
+        """Log a transaction."""
+        txn = Transaction(type, produce_name, quantity, float(price), note)
+        self.transactions.append(txn)
+
     def save_to_file(self, path: str) -> bool:
         """
         Save inventory data to JSON file.
@@ -368,118 +383,3 @@ class Inventory:
         except Exception as e:
             print(f"❌ Failed to load inventory: {e}")
             return False
-
-    def _find_item_by_name(self, name: str) -> Optional[ProduceItem]:
-        """Find item by name (case-insensitive)."""
-        name_lower = name.lower().strip()
-        for item in self.produces:
-            if item.name.lower() == name_lower:
-                return item
-        return None
-
-    def _log_transaction(self, type: str, produce_name: str, quantity: int, 
-                        price: Decimal, note: str = "") -> None:
-        """Log a transaction."""
-        txn = Transaction(type, produce_name, quantity, float(price), note)
-        self.transactions.append(txn)
-
-
-class Transaction:
-    """Enhanced transaction class with better validation and features."""
-    
-    VALID_TYPES = {"sale", "purchase", "adjustment", "refund"}
-    
-    def __init__(self, type: str, produce_name: str, quantity: float, 
-                 unit_price: float, note: str = "", timestamp: Optional[str] = None):
-        """
-        Initialize a transaction.
-        
-        Args:
-            type: Transaction type (sale, purchase, adjustment, refund)
-            produce_name: Name of the produce item
-            quantity: Quantity involved in transaction
-            unit_price: Price per unit
-            note: Additional notes
-            timestamp: Transaction timestamp (auto-generated if None)
-        """
-        if type.lower() not in self.VALID_TYPES:
-            raise ValueError(f"Invalid transaction type '{type}'. Must be one of: {', '.join(self.VALID_TYPES)}")
-        
-        if quantity <= 0:
-            raise ValueError("Quantity must be positive")
-        
-        if unit_price < 0:
-            raise ValueError("Unit price cannot be negative")
-        
-        self.type = type.lower()
-        self.produce_name = produce_name.strip()
-        self.quantity = quantity
-        self.unit_price = unit_price
-        self.note = note.strip()
-        self.timestamp = timestamp or datetime.now().isoformat()
-
-    @property
-    def total_amount(self) -> Decimal:
-        """Calculate total transaction amount."""
-        return Decimal(str(self.quantity)) * Decimal(str(self.unit_price))
-
-    def __str__(self) -> str:
-        """String representation of transaction."""
-        timestamp_dt = datetime.fromisoformat(self.timestamp)
-        formatted_time = timestamp_dt.strftime("%Y-%m-%d %H:%M")
-        
-        return (f"[{formatted_time}] {self.type.upper()}: {self.quantity} {self.produce_name} "
-                f"@ ${self.unit_price:.2f} each (Total: ${self.total_amount:.2f})"
-                f"{' - ' + self.note if self.note else ''}")
-
-    def to_dict(self) -> Dict:
-        """Convert transaction to dictionary for JSON serialization."""
-        return {
-            "type": self.type,
-            "produce_name": self.produce_name,
-            "quantity": self.quantity,
-            "unit_price": self.unit_price,
-            "note": self.note,
-            "timestamp": self.timestamp
-        }
-
-    @classmethod
-    def from_dict(cls, data: Dict) -> 'Transaction':
-        """Create Transaction from dictionary."""
-        return cls(
-            type=data["type"],
-            produce_name=data["produce_name"],
-            quantity=data["quantity"],
-            unit_price=data["unit_price"],
-            note=data.get("note", ""),
-            timestamp=data.get("timestamp")
-        )
-
-
-# Example usage and testing
-if __name__ == "__main__":
-    # Demo the improved inventory system
-    inventory = Inventory()
-    
-    # Add some items
-    inventory.add_item("Apples", 50, 1.50, "Fruit", "lbs")
-    inventory.add_item("Carrots", 30, 0.75, "Vegetable", "lbs")
-    inventory.add_item("Bananas", 25, 0.60, "Fruit", "lbs")
-    
-    # Record some sales
-    inventory.record_sale("Apples", 10, "Customer A")
-    inventory.record_sale("Carrots", 5, "Customer B")
-    
-    # Make adjustments
-    inventory.adjust_item("Bananas", -3, "Spoiled")
-    
-    # Show inventory
-    inventory.list_items()
-    
-    # Show report
-    report = inventory.get_inventory_report()
-    print(f"\n📊 Inventory Report:")
-    print(f"Total Items: {report['total_items']}")
-    print(f"Total Value: ${report['total_value']:.2f}")
-    print(f"Total Revenue: ${report['total_revenue']:.2f}")
-    print(f"Low Stock Items: {report['low_stock_items']}")

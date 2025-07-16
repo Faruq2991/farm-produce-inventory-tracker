@@ -329,6 +329,147 @@ class Inventory:
         txn = Transaction(type, produce_name, quantity, float(price), note)
         self.transactions.append(txn)
 
+    def export_inventory_to_csv(self, filepath: str):
+        """
+        Export inventory data to CSV file.
+        
+        Args:
+            filepath: Path to save the CSV file
+            
+        Returns:
+            bool: True if export was successful
+        """
+        if not self.produces:
+            print("❌ No inventory data to export")
+            return False
+        try:
+            data = []
+            for produce in self.produces:
+                produce_dict = produce.to_dict()
+                produce_dict['total_value'] = float(
+                        Decimal(str(produce_dict['quantity'])) * Decimal(str(produce_dict['price_per_unit'])))
+                data.append(produce_dict)
+            success = self._export_to_csv(data, filepath)
+            if success:
+                print(f"✅ Inventory exported to {filepath}")
+            return success
+        except Exception as e:
+            print(f"❌ Failed to export inventory: {e}")
+            return False
+
+    def export_transactions_to_csv(self, filepath: str):
+        """
+        Export transaction history to CSV file.
+        
+        Args:
+            filepath: Path to save the CSV file
+            
+        Returns:
+            bool: True if export was successful
+        """
+        if not self.produces:
+            print("❌ No transaction data to export")
+            return False
+        try:
+            data = []
+            for txn in self.transactions:
+                txn_dict = txn.to_dict()
+                txn_dict['total_amount'] = float(txn.total_amount)
+                txn_dict['formatted_date'] = datetime.fromisoformat(txn.timestamp).strftime('%Y-%m-%d %H:%M:%S')
+                data.append(txn_dict)
+            success = self._export_to_csv(data, filepath)
+            if success:
+                print(f"✅ Transactions exported to {filepath}")
+            return success
+        except Exception as e:
+            print(f"❌ Failed to export transactions: {e}")
+            return False
+
+    def export_full_report_to_csv(self, filepath: str) -> bool:
+        """
+        Export a comprehensive report to CSV file.
+        
+        Args:
+            filepath: Path to save the CSV file
+            
+        Returns:
+            bool: True if export was successful
+        """
+        try:
+            report = self.get_inventory_report()
+            total_value, breakdown = self.get_inventory_value()
+            
+            data = []
+            for item in breakdown:
+                # Combine inventory and report data
+                item_data = {
+                    'item_name': item['name'],
+                    'quantity': item['quantity'],
+                    'price_per_unit': item['price'],
+                    'total_value': item['value'],
+                    'category': item['category'],
+                    'stock_status': 'Low Stock' if item['quantity'] <= 10 else 'Normal'
+                }
+                data.append(item_data)
+            
+            # Add summary row
+            summary_row = {
+                'item_name': 'SUMMARY',
+                'quantity': report['total_items'],
+                'price_per_unit': 0,
+                'total_value': report['total_value'],
+                'category': f"Total Revenue: ${report['total_revenue']:.2f}",
+                'stock_status': f"Low Stock Items: {report['low_stock_items']}"
+            }
+            data.append(summary_row)
+            
+            success = self._export_to_csv(data, filepath)
+            if success:
+                print(f"✅ Full report exported to {filepath}")
+            return success
+            
+        except Exception as e:
+            print(f"❌ Failed to export report: {e}")
+            return False
+
+    def _export_to_csv(self, data: List[Dict], filepath: str) -> bool:
+        """
+        Export data to CSV file using Python's built-in csv module.
+        
+        Args:
+            data: List of dictionaries to export
+            filepath: Path to save the CSV file
+            
+        Returns:
+            bool: True if export was successful
+        """
+        import csv
+        
+        if not data:
+            print("❌ No data to export")
+            return False
+        
+        try:
+            # Ensure directory exists
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            
+            # Get all possible field names from the data
+            fieldnames = set()
+            for item in data:
+                fieldnames.update(item.keys())
+            fieldnames = sorted(list(fieldnames))
+            
+            with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(data)
+            
+            return True
+            
+        except Exception as e:
+            print(f"❌ CSV export failed: {e}")
+            return False
+
     def save_to_file(self, path: str) -> bool:
         """
         Save inventory data to JSON file.
@@ -355,6 +496,7 @@ class Inventory:
         except Exception as e:
             print(f"❌ Failed to save inventory: {e}")
             return False
+      
 
     def load_from_file(self, path: str) -> bool:
         """

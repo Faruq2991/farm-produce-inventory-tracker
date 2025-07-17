@@ -12,7 +12,7 @@ class InventoryCLI:
         self.inventory = Inventory()
         self.inventory.load_from_file(file_path)
         self.running = True
-    
+        
     def display_menu(self):
         """Display the main menu."""
         print("\n" + "="*50)

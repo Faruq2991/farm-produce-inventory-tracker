@@ -1,16 +1,19 @@
 # 🌽 Farm Produce Inventory Tracker
 
-A simple Python command-line application to manage farm produce inventory, record sales, and track total revenue. Data is persisted in a JSON file for easy backup and portability.
+A Python application to manage farm produce inventory, record sales, and track total revenue. Features both a command-line interface (CLI) and a RESTful API backend (FastAPI). Data is persisted in a JSON file for easy backup and portability.
 
 ---
 
 ## Features
 
-- **Add Produce:** Add new produce items with name, quantity, and price per unit.
+- **Add Produce:** Add new produce items with name, quantity, price per unit, category, and unit.
 - **View Inventory:** List all produce currently in stock.
 - **Record Sales:** Record sales and automatically update inventory and revenue.
 - **Revenue Tracking:** View total revenue from all sales.
+- **Reporting:** Generate inventory and transaction reports.
 - **Data Persistence:** Inventory and revenue are saved to a JSON file.
+- **REST API:** (Coming soon) Manage inventory via HTTP endpoints.
+- **Web Frontend:** (Planned) User-friendly web interface for inventory management.
 
 ---
 
@@ -20,19 +23,25 @@ A simple Python command-line application to manage farm produce inventory, recor
 farm-produce-inventory-tracker/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py              # Main CLI application
-│   └── models/
-│       ├── __init__.py
-│       ├── inventory.py     # Inventory management logic
-│       ├── produce.py       # Produce item model
-│       └── transaction.py   # (Reserved for future use)
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── inventory.py      # Inventory management logic
+│   │   ├── produce.py        # Produce item model
+│   │   └── transaction.py    # Transaction model
+│   ├── api/                  # FastAPI routes (to be created)
+│   │   ├── __init__.py
+│   │   └── endpoints.py      # API endpoints (to be created)
+│   └── main.py               # FastAPI app entrypoint (to be created)
+├── frontend/                 # Web frontend (to be created)
+│   └── ...
 ├── data/
-│   └── inventory.json       # Inventory and revenue data
+│   └── inventory.json        # Inventory and revenue data
 ├── tests/
 │   ├── __init__.py
-│   ├── test_inventory.py    # Inventory tests
-│   └── test_produce.py      # Produce item tests
-├── requirements.txt         # Python dependencies (currently empty)
+│   ├── test_inventory.py     # Inventory tests
+│   └── test_produce.py       # Produce item tests
+├── main.py                   # CLI application entrypoint
+├── requirements.txt          # Python dependencies
 ├── .gitignore
 └── README.md
 ```
@@ -63,36 +72,32 @@ farm-produce-inventory-tracker/
    ```bash
    pip install -r requirements.txt
    ```
-   *(No external dependencies required by default)*
 
 ---
 
 ## Usage
 
-### Running the Application
+### Running the CLI Application
 
 You must specify a data file path for inventory storage (e.g., `data/inventory.json`):
 
 ```bash
-python -m app.main data/inventory.json
+python main.py data/inventory.json
 ```
 
-### Menu Options
+### Running the FastAPI Backend (Coming Soon)
 
-1. **Add a new produce item:**  
-   Enter the name, quantity (integer), and price per unit (decimal).
+The backend API will be available via FastAPI. To run the API server:
 
-2. **View all produce in stock:**  
-   Lists all items in inventory.
+```bash
+uvicorn app.main:app --reload
+```
 
-3. **Record a sale:**  
-   Enter the produce name and quantity sold. Inventory and revenue are updated.
+API docs will be available at `http://localhost:8000/docs`.
 
-4. **View total revenue:**  
-   Displays the total revenue from all sales.
+### Running the Web Frontend (Planned)
 
-5. **Exit:**  
-   Saves inventory and exits the program.
+The frontend will be located in the `frontend/` directory. Instructions will be provided once implemented.
 
 ---
 
@@ -108,7 +113,7 @@ python -m app.main data/inventory.json
 Run the test suite with:
 
 ```bash
-python -m pytest tests/
+python -m unittest discover tests/
 ```
 
 ---
@@ -131,35 +136,19 @@ MIT License
 
 ## Roadmap
 
+- [x] CLI: Inventory management, sales, and reporting
+- [ ] FastAPI backend (in progress)
+- [ ] Web frontend (planned)
 - [ ] Improve error handling and input validation
-- [ ] Add transaction history and reporting
-- [ ] Web or GUI interface
 - [ ] Multi-user support
 - [ ] Mobile app for field data collection
 - [ ] Integration with accounting software
 - [ ] Advanced reporting and analytics
-- [ ] Multi-user support with role-based access
 - [ ] Export to Excel/CSV formats
 - [ ] Barcode scanning support
-- [ ] Adding AI capabilities: 
-   - Market Analysis for a particular produce.
-   - Identify Comapanies that can off take from the farmer.
-   - Identify local businesses or buyers.
-   - Preservation techniques.
-- [ ] 📊 1. Generate Reports
-   - Print a list of all transactions (with filters by type, date, or item)
-   - Show current inventory with value (qty × price)
-- [ ] 📁 2. Export to CSV
-   - Make inventory and transactions exportable for Excel/Google Sheets users
-- [ ] 🔍 3. CLI Enhancements
-   - Add search/filter capabilities
-- [ ]Show low-stock warnings (e.g., if stock < 5)
-- [ ] 🌐 4. Turn It Into a Web App
-   - Build a REST API with FastAPI
-   - Or a simple Flask dashboard
-- [ ] 🧪 5. Advanced Tests
-   - Parametrized test cases for edge conditions
-   - CLI test automation
+- [ ] AI capabilities (market analysis, buyer identification, preservation techniques)
+- [ ] CLI enhancements (search/filter, low-stock warnings)
+- [ ] Advanced tests (parametrized, CLI automation)
 
 ---
 

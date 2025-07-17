@@ -3,6 +3,7 @@ import os
 from datetime import date, datetime
 from typing import List, Dict, Optional, Tuple
 from decimal import Decimal
+from collections import Counter, defaultdict
 from app.models.produce import ProduceItem
 from app.models.transaction import Transaction
 
@@ -469,6 +470,53 @@ class Inventory:
         except Exception as e:
             print(f"❌ CSV export failed: {e}")
             return False
+
+    def generate_summary_insights(self):
+        total_inventory_value = Decimal("0.00")
+        low_stock_items = []
+        category_counts = defaultdict(int)
+        sales_counter = Counter()
+        revenue_per_item = defaultdict(Decimal)
+        last_transaction_time = None
+
+        for item in self.produces:
+            item_value = Decimal(item.quantity) * Decimal(item.price_per_unit)
+            total_inventory_value += item_value
+
+            if item.quantity < 5:
+                low_stock_items.append(item)
+
+            category_counts[item.category] += 1
+
+        for txn in self.transactions:
+            if txn.type.lower() == "sale":
+                sales_counter[txn.produce_name] += int(txn.quantity)
+                revenue_per_item[txn.produce_name] += Decimal(str(txn.unit_price)) * Decimal(str(txn.quantity))
+
+                if not last_transaction_time or txn.timestamp > last_transaction_time:
+                    last_transaction_time = txn.timestamp
+
+        most_sold = sales_counter.most_common(1)
+        top_item = most_sold[0][0] if most_sold else None
+
+        most_profitable = sorted(revenue_per_item.items(), key=lambda x: x[1], reverse=True)
+        top_revenue_item = most_profitable[0][0] if most_profitable else None
+
+        summary = {
+            "total_inventory_value": total_inventory_value,
+            "total_revenue": sum(revenue_per_item.values()),
+            "low_stock_count": len(low_stock_items),
+            "top_selling_item": top_item,
+            "top_revenue_item": top_revenue_item,
+            "last_transaction_time": last_transaction_time,
+            "category_breakdown": dict(category_counts),
+            "total_items": len(self.produces)
+        }
+
+        return summary
+
+
+        
 
     def save_to_file(self, path: str) -> bool:
         """
